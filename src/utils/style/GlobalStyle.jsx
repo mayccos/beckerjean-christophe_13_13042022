@@ -18,10 +18,10 @@ const StyledGlobalStyle = createGlobalStyle`
     a {
         text-decoration: none;
     }
-    .main {
-        flex: 1;
-        background-color: ${colors.darkBlue};
-    }
+    // .main {
+    //     flex: 1;
+    //     background-color: ${colors.darkBlue};
+    // }
   
     button {
         cursor: pointer;

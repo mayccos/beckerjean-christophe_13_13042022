@@ -2,9 +2,15 @@ import styled from 'styled-components'
 import { colors } from '../../utils/style/colors'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUserCircle } from '@fortawesome/free-solid-svg-icons'
+
 // import components
 import LoginForm from '../../components/LoginForm'
+
 // Creation components that using styled-component
+const Main = styled.main`
+    flex: 1;
+    background-color: ${colors.darkBlue};
+`
 const SignInContent = styled.section`
     box-sizing: border-box;
     background-color: ${colors.white};
@@ -13,8 +19,9 @@ const SignInContent = styled.section`
     margin-top: 3rem;
     padding: 2rem;
 `
-
 const H1 = styled.h1``
+
+
 /**
  * creation of a component to display website's login page
  * @name Home
@@ -22,12 +29,12 @@ const H1 = styled.h1``
  */
 export default function Login() {
     return (
-        <main className="main">
+        <Main>
             <SignInContent>
                 <FontAwesomeIcon icon={faUserCircle} className="sign-in-icon" />
                 <H1>Sign In</H1>
                 <LoginForm />
             </SignInContent>
-        </main>
+        </Main>
     )
 }

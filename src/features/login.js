@@ -1,90 +1,103 @@
 import { createSlice } from '@reduxjs/toolkit'
 import axios from 'axios'
-import { selectUser } from '../utils/selector'
-//Initial state of Login's features
+import { getUser } from './user'
+
+// initial state
 const initialState = {
+    isLoading: false,
     token: '',
+    tokenExist: '',
+    error: '',
+    isLogged: false,
     status: 'void',
-    error: null,
 }
 
-export function getToken(email, password) {
-    return async (dispatch, getState) => {
-        const status = selectUser(getState()).status
+// SLICE //      _____________________________________________________________
 
-        if (status === 'pending' || status === 'updating') {
-            return
-        }
-        dispatch(actions.fetching())
-        try {
-            const response = await axios.post(
-                'http://localhost:3001/api/v1/user/login',
-                { email, password }
-            )
-            const data = await response.data
-            dispatch(actions.resolved(data.body.token))
-        } catch (error) {
-            dispatch(actions.rejected(error.message))
-            window.location.replace('/*')
-        }
-    }
-}
-
-// Slice
 const { actions, reducer } = createSlice({
-    name: 'user',
-    initialState: initialState,
+    name: 'login',
+    initialState,
     reducers: {
-        fetching: (draft) => {
-            if (draft.status === 'void') {
-                // on passe en pending
+        fetching: {
+            prepare: () => ({
+                payload: {},
+            }),
+            reducer: (draft) => {
+                draft.isLoading = true
+                draft.token = ''
+                draft.tokenExist = ''
+                draft.error = ''
+                draft.isLogged = false
                 draft.status = 'pending'
                 return
-            }
-            // si le statut est rejected
-            if (draft.status === 'rejected') {
-                // on supprime l'erreur et on passe en pending
-                draft.error = null
-                draft.status = 'pending'
-                return
-            }
-            // si le statut est resolved
-            if (draft.status === 'resolved') {
-                // on passe en updating (requête en cours mais des données sont déjà présentent)
-                draft.status = 'updating'
-                return
-            }
-            // sinon l'action est ignorée
-            return
+            },
         },
-        resolved: (draft, action) => {
-            // si la requête est en cours
-            if (draft.status === 'pending' || draft.status === 'updating') {
-                // on passe en resolved et on sauvegarde les données
+        resolved: {
+            prepare: (token) => {
+                return {
+                    payload: { token },
+                }
+            },
+            reducer: (draft, action) => {
+                draft.isLoading = false
                 draft.token = action.payload
+                draft.tokenExist = true
+                draft.isLogged = true
+                draft.error = ''
                 draft.status = 'resolved'
-                draft.connected = !draft.connected
-                return draft
-            }
-            // sinon l'action est ignorée
-            return
-        },
-        rejected: (draft, action) => {
-            // si la requête est en cours
-            if (draft.status === 'pending' || draft.status === 'updating') {
-                // on passe en rejected, on sauvegarde l'erreur et on supprime les données
-                draft.status = 'rejected'
-                draft.error = action.payload
-                draft.token = null
                 return
-            }
-            // sinon l'action est ignorée
-            return
+            },
+        },
+        rejected: {
+            prepare: (error) => {
+                return {
+                    payload: { error },
+                }
+            },
+            reducer: (draft, action) => {
+                draft.isLoading = false
+                draft.token = ''
+                draft.tokenExist = false
+                draft.isLogged = false
+                draft.error = action.payload
+                draft.status = 'rejected'
+                return
+            },
         },
     },
 })
 
-export const logOut = actions.logOut
+// CONSTANTS // __________________________________________________________________
 
-// we export reducer as default export
+const baseURL = 'http://localhost:3001/api/v1/user/'
+
+// API CALLS // __________________________________________________________________
+
+/**
+ * to get user token with POST method in API Call
+ * @function
+ * @name getToken
+ * @param {string} email
+ * @param {string} password
+ * @returns {object}
+ */
+export const getToken = (email, password) => {
+    return (dispatch) => {
+        dispatch(actions.fetching())
+        axios
+            .post(baseURL + 'login', {
+                email,
+                password,
+            })
+            .then((response) => {
+                dispatch(actions.resolved(response.data.body.token))
+                localStorage.setItem('token', response.data.body.token)
+                const token = localStorage.getItem('token')
+                dispatch(getUser(token))
+            })
+            .catch((error) => {
+                dispatch(actions.rejected(error.message))
+            })
+    }
+}
 export default reducer

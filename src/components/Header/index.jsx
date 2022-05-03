@@ -2,15 +2,18 @@ import styled from 'styled-components'
 import { colors } from '../../utils/style/colors'
 import argentBankLogo from '../../assets/argentBankLogo.png'
 import { Link } from 'react-router-dom'
-import { faUserCircle } from '@fortawesome/free-solid-svg-icons'
+import { faUserCircle, faSignOut } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-
+import { useSelector } from 'react-redux'
+import { selectLogged, selectUserFirstName } from '../../utils/selector'
+import { logOut } from '../../features/user'
 // Creation components that using styled-component
 const MainNav = styled.nav`
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 5px 20px;
+    height: 40px;
 `
 const Div = styled.div``
 const MainNavItem = styled(Link)`
@@ -38,14 +41,33 @@ const MainNavLogoImg = styled.img`
     max-width: 100%;
     width: 200px;
 `
-//const HeaderIcon = styled.i``
+
 const H1 = styled.h1``
+
+// JSX // _________________________________________________________________
+
+/**
+ * to log out and unstock token
+ * @function
+ * @name logout
+ * @returns {object}
+ */
+export const logout = () => {
+    localStorage.removeItem('token')
+    return (dispatch) => {
+        dispatch(logOut())
+    }
+}
 /**
  * Creation of a component to show the header
- * @returns {HTML element} header
+ * @returns {JSX} header
  */
 
 function Header() {
+    const isRemembered = localStorage.getItem('token')
+    const isConnected = useSelector(selectLogged)
+    const firstName = useSelector(selectUserFirstName)
+
     return (
         <MainNav>
             <MainNavLogo to="/">
@@ -56,12 +78,25 @@ function Header() {
                 />
                 <H1 className="sr-only">Argent Bank</H1>
             </MainNavLogo>
-            <Div>
-                <MainNavItem to="/login">
-                    <FontAwesomeIcon icon={faUserCircle}></FontAwesomeIcon>
-                    Sign In
-                </MainNavItem>
-            </Div>
+            {!isRemembered || !isConnected ? (
+                <Div>
+                    <MainNavItem to="/login">
+                        <FontAwesomeIcon icon={faUserCircle} />
+                        Sign In
+                    </MainNavItem>
+                </Div>
+            ) : (
+                <div>
+                    <MainNavItem to="/profile">
+                        <FontAwesomeIcon icon={faUserCircle} />
+                        {firstName}
+                    </MainNavItem>
+                    <MainNavItem to="/">
+                        <FontAwesomeIcon icon={faSignOut} />
+                        Sign out
+                    </MainNavItem>
+                </div>
+            )}
         </MainNav>
     )
 }

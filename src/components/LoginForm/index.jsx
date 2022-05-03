@@ -10,9 +10,10 @@ import { getToken } from '../../features/login'
 // Selectors
 import {
     selectStatus,
-    selectError,
     selectToken,
     selectTokenExist,
+    //selectError,
+    //selectLogged,
 } from '../../utils/selector'
 
 // Creation components that using styled-component
@@ -75,26 +76,30 @@ export default function LoginForm() {
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const status = useSelector(selectStatus)
-    const error = useSelector(selectError)
     const token = useSelector(selectToken)
-    //const tokenExist = useSelector(selectTokenExist)
+    const tokenExist = useSelector(selectTokenExist)
+    //const connected = useSelector(selectLogged)
     /**
      *
-     * @description Function that handle the log In event
+     * @description Function that handle the log In event submit
      * @param {object} event to get informations about the action
      */
     //
     const handleSubmit = (e) => {
         e.preventDefault()
         setInvalidFields('')
-        if (email === '' || password === '' || status === 'rejected') {
-            return setInvalidFields(
-                'Please verify your email and your password'
-            )
+        if (email === '' || password === '' || tokenExist === false) {
+            return setInvalidFields('Invalid email or password')
+        } else if (status === 'rejected') {
+            return setInvalidFields('Sorry, a technical Error occurred ')
         } else {
             dispatch(getToken(email, password))
         }
     }
+
+    // if (connected === true) {
+    //     return navigate('/profile')
+    // }
     useEffect(() => {
         if (status === 'resolved') {
             if (!window.localStorage.getItem('token') && checked) {
@@ -105,12 +110,7 @@ export default function LoginForm() {
     }, [checked, navigate, status, token])
 
     return (
-        <Form
-            onSubmit={handleSubmit}
-            action=""
-            className="form"
-            data-error={status === 'rejected' ? error : ''}
-        >
+        <Form onSubmit={handleSubmit}>
             <InputWrapper>
                 <InputLabel htmlFor="email">Email</InputLabel>
                 <InputStyle
@@ -140,10 +140,7 @@ export default function LoginForm() {
                 <RememberLabel htmlFor="rememberMe">Remember me</RememberLabel>
             </InputRemember>
             <ErrorMessage>{invalidFields}</ErrorMessage>
-            {/* {LoginForm.status ===
-                'rejected'(
-                    <ErrorMessage>Email or password invalid</ErrorMessage>
-                )} */}
+
             <LoginButton type="submit">Sign In</LoginButton>
         </Form>
     )
