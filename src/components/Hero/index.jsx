@@ -45,6 +45,13 @@ const Text = styled.p`
         font-size: 1.2rem;
     }
 `
+
+/**
+ * create component card of profile page
+ *
+ *
+ * @return {JSX} hero
+ */
 export default function Hero() {
     return (
         <HeroStyle>

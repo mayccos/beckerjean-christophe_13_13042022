@@ -1,103 +1,63 @@
-import axios from 'axios'
-
-// IMPORTS // ______________________________________________________________
-
 import { createSlice } from '@reduxjs/toolkit'
 
-// initial state
-const initialState = {
-    isLoading: false,
-    isLogged: false,
-    user: {},
-    error: '',
-}
-
-// CONSTANTS // __________________________________________________________________
-
-const baseURL = 'http://localhost:3001/api/v1/user/'
-
-// CALL API //  __________________________________________________________________
 /**
- * to get user token with POST method in API Call
- * @function
- * @name getUser
- * @param {string} token
- * @returns {object}
+ * The "main" reducer
+ *
+ * @return state
  */
-export const getUser = (token) => {
-    return (dispatch) => {
-        dispatch(actions.fetching())
-        axios({
-            method: 'POST',
-            url: baseURL + 'profile',
-            headers: { Authorization: `Bearer ${token}` },
-        })
-            .then((response) => {
-                dispatch(actions.resolved(response.data))
-            })
-            .catch((error) => {
-                dispatch(actions.rejected(error.message))
-            })
-    }
+
+const initialState = {
+    token: '',
+    firstName: '',
+    lastName: '',
+    editName: false,
 }
 
-// SLICE //   ______________________________________________________________
+//Slice
 const { actions, reducer } = createSlice({
     name: 'user',
     initialState,
     reducers: {
-        fetching: {
-            prepare: () => ({
-                payload: {},
+        login: {
+            prepare: (token) => ({ payload: { token } }),
+            reducer: (draft, action) => {
+                draft.token = action.payload.token
+            },
+        },
+        userLogout: {
+            reducer: () => {
+                return initialState
+            },
+        },
+        userData: {
+            prepare: (firstName, lastName) => ({
+                payload: { firstName, lastName },
             }),
+            reducer: (draft, action) => {
+                draft.firstName = action.payload.firstName
+                draft.lastName = action.payload.lastName
+            },
+        },
+        edit: {
             reducer: (draft) => {
-                draft.isLoading = true
-                return
+                draft.editName = !draft.editName
             },
         },
-        resolved: {
-            prepare: (user) => {
-                return {
-                    payload: { user },
-                }
-            },
-            reducer: (draft, action) => {
-                draft.isLoading = false
-                draft.isLogged = true
-                draft.user = action.payload
-                draft.error = ''
-                return
-            },
-        },
-        rejected: {
-            prepare: (error) => {
-                return {
-                    payload: { error },
-                }
-            },
-            reducer: (draft, action) => {
-                draft.isLoading = false
-                draft.isLogged = false
-                draft.user = {}
-                draft.error = action.payload
-                return
-            },
-        },
-        logOut: {
-            prepare: () => ({
-                payload: {},
+        userEdition: {
+            prepare: (body) => ({
+                payload: { firstName: body.firstName, lastName: body.lastName },
             }),
             reducer: (draft, action) => {
-                draft.isLoading = false
-                draft.isLogged = false
-                draft.user = {}
-                draft.error = action.payload
-                return
+                if (draft.editName === true) {
+                    draft.firstName = action.payload.firstName
+                    draft.lastName = action.payload.lastName
+                    draft.editName = false
+                }
             },
         },
     },
 })
-
-export const { logOut } = actions
-
+//Export actions
+export const { login, userLogout, userData, edit, userEdition } = actions
+//Export reducer
 export default reducer

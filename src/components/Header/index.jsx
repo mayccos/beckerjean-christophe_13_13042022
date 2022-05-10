@@ -5,8 +5,7 @@ import { Link } from 'react-router-dom'
 import { faUserCircle, faSignOut } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useSelector } from 'react-redux'
-import { selectLogged, selectUserFirstName } from '../../utils/selector'
-import { logOut } from '../../features/user'
+
 // Creation components that using styled-component
 const MainNav = styled.nav`
     display: flex;
@@ -53,10 +52,8 @@ const H1 = styled.h1``
  * @returns {object}
  */
 export const logout = () => {
-    localStorage.removeItem('token')
-    return (dispatch) => {
-        dispatch(logOut())
-    }
+    localStorage.clear()
+    window.location = '/'
 }
 /**
  * Creation of a component to show the header
@@ -64,9 +61,8 @@ export const logout = () => {
  */
 
 function Header() {
-    const isRemembered = localStorage.getItem('token')
-    const isConnected = useSelector(selectLogged)
-    const firstName = useSelector(selectUserFirstName)
+    const { isLogged } = useSelector((state) => state.login)
+    const firstName = useSelector((state) => state.user.firstName)
 
     return (
         <MainNav>
@@ -75,10 +71,11 @@ function Header() {
                     className="main-nav-logo-image"
                     src={argentBankLogo}
                     alt="Argent Bank Logo"
+                    onClick={logout}
                 />
                 <H1 className="sr-only">Argent Bank</H1>
             </MainNavLogo>
-            {!isRemembered || !isConnected ? (
+            {!isLogged ? (
                 <Div>
                     <MainNavItem to="/login">
                         <FontAwesomeIcon icon={faUserCircle} />
@@ -91,7 +88,7 @@ function Header() {
                         <FontAwesomeIcon icon={faUserCircle} />
                         {firstName}
                     </MainNavItem>
-                    <MainNavItem to="/">
+                    <MainNavItem to="/" onClick={logout}>
                         <FontAwesomeIcon icon={faSignOut} />
                         Sign out
                     </MainNavItem>
@@ -100,5 +97,5 @@ function Header() {
         </MainNav>
     )
 }
-
+//Export
 export default Header

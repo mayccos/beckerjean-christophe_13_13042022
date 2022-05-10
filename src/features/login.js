@@ -1,103 +1,92 @@
 import { createSlice } from '@reduxjs/toolkit'
-import axios from 'axios'
-import { getUser } from './user'
+import { postLogin } from '../hook/axios'
+import { login } from './user'
 
-// initial state
+/**
+ * login post
+ *
+ * @param Hooks -
+ * @return reducer function, the state .
+ * @param loginPost -
+ * @return check fetching status, order fetching and send action to reducer
+ * @return state
+ */
+
 const initialState = {
-    isLoading: false,
-    token: '',
-    tokenExist: '',
-    error: '',
-    isLogged: false,
     status: 'void',
+    data: null,
+    error: null,
+    token: '',
+    isLogged: '',
 }
-
-// SLICE //      _____________________________________________________________
-
+//Slice
 const { actions, reducer } = createSlice({
     name: 'login',
     initialState,
     reducers: {
+        logout: {
+            reducer: () => {
+                return initialState
+            },
+        },
         fetching: {
-            prepare: () => ({
-                payload: {},
-            }),
             reducer: (draft) => {
-                draft.isLoading = true
-                draft.token = ''
-                draft.tokenExist = ''
-                draft.error = ''
-                draft.isLogged = false
-                draft.status = 'pending'
-                return
+                if (draft.status === 'void') {
+                    draft.status = 'pending'
+                }
+                if (draft.status === 'rejected') {
+                    draft.error = null
+                    draft.status = 'pending'
+                }
+                if (draft.status === 'resolved') {
+                    draft.status = 'updating'
+                }
             },
         },
         resolved: {
-            prepare: (token) => {
-                return {
-                    payload: { token },
-                }
-            },
             reducer: (draft, action) => {
-                draft.isLoading = false
-                draft.token = action.payload
-                draft.tokenExist = true
-                draft.isLogged = true
-                draft.error = ''
-                draft.status = 'resolved'
-                return
+                if (draft.status === 'pending' || draft.status === 'updating') {
+                    draft.data = action.payload
+                    draft.isLogged = !draft.isLogged
+                    draft.token = true
+                    draft.status = 'resolved'
+                }
             },
         },
         rejected: {
-            prepare: (error) => {
-                return {
-                    payload: { error },
-                }
-            },
             reducer: (draft, action) => {
-                draft.isLoading = false
-                draft.token = ''
-                draft.tokenExist = false
-                draft.isLogged = false
-                draft.error = action.payload
-                draft.status = 'rejected'
-                return
+                if (draft.status === 'pending' || draft.status === 'updating') {
+                    draft.error = action.payload
+                    draft.data = null
+                    draft.status = 'rejected'
+                    draft.token = ''
+                }
             },
         },
     },
 })
 
-// CONSTANTS // __________________________________________________________________
+//Thunk
+export const loginPost = (email, password) => async (dispatch) => {
+    dispatch(actions.fetching())
+    try {
+        const body = { email: email, password: password }
+        const data = await postLogin(
+            'http://localhost:3001/api/v1/user/login',
+            body
+        )
 
-const baseURL = 'http://localhost:3001/api/v1/user/'
-
-// API CALLS // __________________________________________________________________
-
-/**
- * to get user token with POST method in API Call
- * @function
- * @name getToken
- * @param {string} email
- * @param {string} password
- * @returns {object}
- */
-export const getToken = (email, password) => {
-    return (dispatch) => {
-        dispatch(actions.fetching())
-        axios
-            .post(baseURL + 'login', {
-                email,
-                password,
-            })
-            .then((response) => {
-                dispatch(actions.resolved(response.data.body.token))
-                localStorage.setItem('token', response.data.body.token)
-                const token = localStorage.getItem('token')
-                dispatch(getUser(token))
-            })
-            .catch((error) => {
-                dispatch(actions.rejected(error.message))
-            })
+        if (data.status !== 200) {
+            throw new Error(data.message)
+        } else {
+            dispatch(actions.resolved(data))
+            dispatch(login(data.body.token))
+        }
+    } catch (error) {
+        dispatch(actions.rejected(error.message))
     }
 }
+//Export actions
+export const { logout } = actions
+//Export reducer
 export default reducer

@@ -1,13 +1,13 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { putUser } from '../hook/axios'
-import { userEdition } from './user'
+import { postUser } from '../hook/axios'
+import { userData } from './user'
 
 /**
- * request profile
+ *  profile post
  *
  * @param Hooks -
  * @return reducer function, the state .
- * @param editUser-
+ * @param accessProfile -
  * @return check fetching status, order fetching and send action to reducer
  * @return state
  */
@@ -16,28 +16,26 @@ const initialState = {
     status: 'void',
     data: null,
     error: null,
+    userId: null,
 }
+
 //Slice
 const { actions, reducer } = createSlice({
-    name: 'edition',
+    name: 'profile',
     initialState,
     reducers: {
         fetching: {
             reducer: (draft) => {
                 if (draft.status === 'void') {
                     draft.status = 'pending'
-                    return
                 }
                 if (draft.status === 'rejected') {
                     draft.error = null
                     draft.status = 'pending'
-                    return
                 }
                 if (draft.status === 'resolved') {
                     draft.status = 'updating'
-                    return
                 }
-                return
             },
         },
         resolved: {
@@ -45,9 +43,8 @@ const { actions, reducer } = createSlice({
                 if (draft.status === 'pending' || draft.status === 'updating') {
                     draft.data = action.payload
                     draft.status = 'resolved'
-                    return
+                    draft.userId = action.payload
                 }
-                return
             },
         },
         rejected: {
@@ -56,35 +53,34 @@ const { actions, reducer } = createSlice({
                     draft.error = action.payload
                     draft.data = null
                     draft.status = 'rejected'
-                    return
                 }
-                return
             },
         },
     },
 })
 //Thunk
-export const editUser = (body) => {
-    return async (dispatch, getState) => {
-        const token = getState().user.token
+export const profilePost = () => async (dispatch, getState) => {
+    const token = getState().user.token
+    console.log(token)
+    dispatch(actions.fetching())
 
-        dispatch(actions.fetching())
-
-        try {
-            const data = await putUser(
-                'http://localhost:3001/api/v1/user/profile',
-                body,
-                token
-            )
-            if (data.status !== 200) {
-                throw new Error(data.message)
-            } else {
-                dispatch(actions.resolved(data))
-                dispatch(userEdition(data.body))
-            }
-        } catch (error) {
-            dispatch(actions.rejected(error))
+    try {
+        const data = await postUser(
+            'http://localhost:3001/api/v1/user/profile',
+            {},
+            token
+        )
+        if (data.status !== 200) {
+            throw new Error('Failed request')
+        } else {
+            dispatch(actions.resolved(data))
+            const firstName = data.body.firstName
+            const lastName = data.body.lastName
+            const userId = data.body.id
+            dispatch(userData(firstName, lastName, userId))
         }
+    } catch (error) {
+        dispatch(actions.rejected(error.message))
     }
 }
 //Export reducer

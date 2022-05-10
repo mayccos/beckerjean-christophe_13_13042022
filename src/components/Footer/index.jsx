@@ -24,5 +24,5 @@ function Footer() {
         </FooterStyle>
     )
 }
-
+//Export
 export default Footer

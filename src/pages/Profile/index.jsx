@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from 'react-redux'
 // Selectors
 import { selectToken } from '../../utils/selector'
 // thunk
-import { getUser } from '../../features/user'
+import { profilePost } from '../../features/profile'
 // import accounts mocked
 import accounts from '../../_Mocks_/accounts'
 
@@ -24,10 +24,12 @@ const Main = styled.main`
 const H2 = styled.h2``
 function Profile() {
     const dispatch = useDispatch()
-    const token = useSelector(selectToken) || localStorage.getItem('token')
-
+    const token =
+        useSelector((state) => state.login.token) ||
+        localStorage.getItem('token')
+    console.log(token)
     useEffect(() => {
-        dispatch(getUser(token))
+        dispatch(profilePost(token))
     })
     return (
         <Main>

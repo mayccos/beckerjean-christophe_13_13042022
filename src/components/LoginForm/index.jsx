@@ -5,16 +5,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 // Thunk
-import { getToken } from '../../features/login'
-
-// Selectors
-import {
-    selectStatus,
-    selectToken,
-    selectTokenExist,
-    //selectError,
-    //selectLogged,
-} from '../../utils/selector'
+import { loginPost } from '../../features/login'
 
 // Creation components that using styled-component
 const Form = styled.form``
@@ -58,56 +49,59 @@ const ErrorMessage = styled.p`
 `
 
 /**
- * creation  component to display form
- * @name Form
- * @param {string} htmlFor
- * @param {string} inputType
- * @param {string} id
- * @param {string} value
- * @param {string} onChange
- * @returns {?JSX}
+ * create Form JSX
+ *
+ * @function  handleSubmit
+ * @return user login
+ * @return html - Form
  */
-
 export default function LoginForm() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
-    const [checked, setChecked] = useState(false)
+
     const [invalidFields, setInvalidFields] = useState('')
     const navigate = useNavigate()
     const dispatch = useDispatch()
-    const status = useSelector(selectStatus)
-    const token = useSelector(selectToken)
-    const tokenExist = useSelector(selectTokenExist)
-    //const connected = useSelector(selectLogged)
+
+    //selector
+    const { status } = useSelector((state) => state.login)
+    const { error } = useSelector((state) => state.login)
+
     /**
      *
      * @description Function that handle the log In event submit
-     * @param {object} event to get informations about the action
+     * @param {object} event to get information about the action
      */
     //
     const handleSubmit = (e) => {
         e.preventDefault()
         setInvalidFields('')
-        if (email === '' || password === '' || tokenExist === false) {
+        if (email === '' || password === '') {
             return setInvalidFields('Invalid email or password')
-        } else if (status === 'rejected') {
-            return setInvalidFields('Sorry, a technical Error occurred ')
         } else {
-            dispatch(getToken(email, password))
+            dispatch(loginPost(email, password))
         }
     }
-
-    // if (connected === true) {
-    //     return navigate('/profile')
-    // }
+    // function to manage the  response case resolved
     useEffect(() => {
         if (status === 'resolved') {
-            if (!window.localStorage.getItem('token') && checked) {
-                window.localStorage.setItem('token', token)
-            }
             navigate('/profile')
         }
-    }, [checked, navigate, status, token])
+    }, [navigate, status])
+
+    //function to manage the  response case of invalid credentials
+    useEffect(() => {
+        if (error === 'Request failed with status code 400') {
+            setInvalidFields('Invalid email or password')
+        }
+    }, [setInvalidFields, error])
+
+    //function to manage the   case  of not response of api
+    useEffect(() => {
+        if (error === 'Network Error') {
+            return setInvalidFields('Sorry, a technical Error occurred ')
+        }
+    }, [setInvalidFields, error])
 
     return (
         <Form onSubmit={handleSubmit}>
@@ -118,7 +112,7 @@ export default function LoginForm() {
                     id="email"
                     value={email}
                     name="email"
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => setEmail(e.target.value.trim())}
                 />
             </InputWrapper>
             <InputWrapper>
@@ -127,16 +121,11 @@ export default function LoginForm() {
                     type="text"
                     id="password"
                     name="password"
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e) => setPassword(e.target.value.trim())}
                 />
             </InputWrapper>
             <InputRemember>
-                <InputStyle
-                    type="checkbox"
-                    name="rememberMe"
-                    id="rememberMe"
-                    onChange={(e) => setChecked(e.target.checked)}
-                />
+                <InputStyle type="checkbox" name="rememberMe" id="rememberMe" />
                 <RememberLabel htmlFor="rememberMe">Remember me</RememberLabel>
             </InputRemember>
             <ErrorMessage>{invalidFields}</ErrorMessage>
