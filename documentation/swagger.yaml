@@ -1,0 +1,228 @@
+swagger: '2.0'
+info:
+    description: contains API Endpoint Template and Samples for the Transaction Part
+    version: 1.0.0
+    title: Bank Argent API documentation part 2
+    termsOfService: http://swagger.io/terms/
+# host: localhost:3001
+# basePath: /api/v1
+tags:
+    - name: Transactions
+      description: Everything about user's transactions
+    - name: Transaction
+      description: Everything about a transaction
+schemes:
+    - https
+    - http
+paths:
+    /user/profile/{accountId}:
+        get:
+            tags:
+                - Transactions
+            summary: User's transactions of current month
+            description: get user's transactions
+            consumes:
+                - application/json
+            produces:
+                - application/json
+            parameters:
+                - name: Autorization
+                  in: header
+                  description: Attach Bearer JWT token
+                  required: true
+                  type: string
+                - name: accountId
+                  in: path
+                  description: Account ID
+                  required: true
+                  type: string
+                - name: Dates
+                  in: body
+                  description: Start and end of transactions to dispaly
+                  required: true
+                  schema:
+                      $ref: '#/definitions/TransactionsDate'
+            responses:
+                '200':
+                    description: successful operation
+                    schema:
+                        $ref: '#/definitions/Transactions'
+                '400':
+                    description: Invalid values
+                '500':
+                    description: Internal Server Error
+            security:
+                - Bearer: []
+    /user/{transactionId}:
+        get:
+            tags:
+                - Transaction
+            summary: transaction details
+            description: 'Transaction details: type, category and notes'
+            operationId: getTransactionId
+            consumes:
+                - application/json
+            produces:
+                - application/json
+            parameters:
+                - name: Autorization
+                  in: header
+                  description: Attach Bearer JWT token
+                  required: true
+                  type: string
+                - name: transactionId
+                  in: path
+                  description: Transaction ID
+                  required: true
+                  type: string
+            responses:
+                '200':
+                    description: successful operation
+                    schema:
+                        $ref: '#/definitions/Transaction'
+                '400':
+                    description: Invalid values
+                '500':
+                    description: Internal Server Error
+            security:
+                - Bearer: []
+        put:
+            tags:
+                - Transaction
+            summary: Update transaction details
+            description: Update transaction details
+            operationId: upDateTransactionId
+            consumes:
+                - application/json
+            produces:
+                - application/json
+            parameters:
+                - name: Autorization
+                  in: header
+                  description: Attach Bearer JWT token
+                  required: true
+                  type: string
+                - name: transactionId
+                  in: path
+                  description: Transaction ID
+                  required: true
+                  type: string
+                - name: Details
+                  in: body
+                  description: Update transaction's details
+                  required: true
+                  schema:
+                      $ref: '#/definitions/Details'
+            responses:
+                '200':
+                    description: successful operation
+                    schema:
+                        $ref: '#/definitions/TransactionDetails'
+                '400':
+                    description: Invalid values
+                '500':
+                    description: Internal Server Error
+            security:
+                - Bearer: []
+securityDefinitions:
+    Bearer:
+        type: apiKey
+        name: Authorization
+        in: header
+definitions:
+    Transactions:
+        type: object
+        properties:
+            status:
+                type: integer
+                format: int64
+            message:
+                type: string
+                format: string
+            body:
+                type: array
+                items:
+                    $ref: '#/definitions/Informations'
+        xml:
+            name: Transactions
+    Transaction:
+        type: object
+        properties:
+            status:
+                type: integer
+                format: int64
+            message:
+                type: string
+                format: string
+            schema:
+                $ref: '#/definitions/Informations'
+        xml:
+            name: Transactions
+    TransactionDetails:
+        type: object
+        properties:
+            status:
+                type: integer
+                format: int64
+            message:
+                type: string
+                format: string
+            schema:
+                $ref: '#/definitions/Details'
+        xml:
+            name: Details
+    Informations:
+        type: object
+        properties:
+            transactionId:
+                type: integer
+                format: int64
+                description: transaction ID
+            date:
+                type: string
+                format: Date-time
+                description: transaction date
+            description:
+                type: string
+                description: transaction description
+            amount:
+                type: integer
+                format: int64
+                description: transaction amount
+            balance:
+                type: integer
+                format: int64
+                description: account balance after transaction
+        xml:
+            name: Transaction
+    Details:
+        type: object
+        properties:
+            transactionId:
+                type: integer
+                format: int64
+                description: transaction ID
+            type:
+                type: string
+                description: transaction type
+            category:
+                type: string
+                description: transaction category
+            notes:
+                type: string
+                description: transaction notes
+        xml:
+            name: TransactionDetails
+    TransactionsDate:
+        type: object
+        properties:
+            from:
+                type: string
+                format: date
+                description: start date of transactions recovery (one month ago)
+            to:
+                type: string
+                format: date
+                description: end date of transaction recovery (today)
+        xml:
+            name: TransactionsDate

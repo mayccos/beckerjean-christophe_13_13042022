@@ -1,70 +1,47 @@
-# Getting Started with Create React App
+# ArgentBank
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+is a fresh new bank trying to break into the industry and wants to implement her APP In that way, two phases have been set up :
 
-## Available Scripts
+-   Phase 1: User authentication
 
-In the project directory, you can run:
+The goal here was to transform a static HTML and CSS mock-up into a React responsive application. For this purpose, it was requested to use react as a state manager and respect several issues to achieve this.
 
-### `npm start`
+-   Phase 2: transactions We are here in a conception phase of a new feature that can allow users to view all their transactions for the current month, the details of a transaction in another view and to add, modify or delete information about a transaction.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+It's a question here of documenting the implementation of these functionalities on the API side by using the Swagger syntax.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Prerequisites
 
-### `npm test`
+-   NodeJS Version 16.13.0
+-   Yarn Version 1.22.11
+-   Visual Studio Code or another IDE of your choice
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Dependencies
 
-### `npm run build`
+-   React Version 18.0.0
+-   React-router-dom Version 6.3.0
+-   Redux Version 4.1.2
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Backend API
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Installation and Usage
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+-   Fork and clone the Backend API on your computer: git clone https://github.com/mayccos/Project-13-Bank-API.git
+-   Follow the instruction of ReadMe files to install and use API
 
-### `npm run eject`
+## Frontend APP
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Installation
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+-   Fork and clone the Front-end APP on your computer: git clone https://github.com/mayccos/beckerjean-christophe_13_13042022.git
+-   Install the dependencies with yarn install or npm install
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### Usage
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+-   Run the Frontend App, which will then listen on port 3000 by default with "yarn start" or "npm start"
 
-## Learn More
+## Author information
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Becker Jean-Christophe
 
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+-   Study at OpenClassrooms

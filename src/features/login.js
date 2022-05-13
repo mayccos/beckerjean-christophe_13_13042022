@@ -29,6 +29,7 @@ const { actions, reducer } = createSlice({
                 return initialState
             },
         },
+
         fetching: {
             reducer: (draft) => {
                 if (draft.status === 'void') {

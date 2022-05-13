@@ -58,7 +58,7 @@ const ErrorMessage = styled.p`
 export default function LoginForm() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
-
+    const [isChecked, setIsChecked] = useState(false)
     const [invalidFields, setInvalidFields] = useState('')
     const navigate = useNavigate()
     const dispatch = useDispatch()
@@ -66,13 +66,14 @@ export default function LoginForm() {
     //selector
     const { status } = useSelector((state) => state.login)
     const { error } = useSelector((state) => state.login)
+    const { token } = useSelector((state) => state.user)
 
     /**
      *
      * @description Function that handle the log In event submit
      * @param {object} event to get information about the action
      */
-    //
+
     const handleSubmit = (e) => {
         e.preventDefault()
         setInvalidFields('')
@@ -85,9 +86,12 @@ export default function LoginForm() {
     // function to manage the  response case resolved
     useEffect(() => {
         if (status === 'resolved') {
+            if (!window.localStorage.getItem('token') && isChecked) {
+                window.localStorage.setItem('token', token)
+            }
             navigate('/profile')
         }
-    }, [navigate, status])
+    }, [isChecked, token, navigate, status])
 
     //function to manage the  response case of invalid credentials
     useEffect(() => {
@@ -118,14 +122,19 @@ export default function LoginForm() {
             <InputWrapper>
                 <InputLabel htmlFor="password">Password</InputLabel>
                 <InputStyle
-                    type="text"
+                    type="password"
                     id="password"
                     name="password"
                     onChange={(e) => setPassword(e.target.value.trim())}
                 />
             </InputWrapper>
             <InputRemember>
-                <InputStyle type="checkbox" name="rememberMe" id="rememberMe" />
+                <InputStyle
+                    type="checkbox"
+                    name="rememberMe"
+                    id="rememberMe"
+                    onChange={(e) => setIsChecked(e.target.checked)}
+                />
                 <RememberLabel htmlFor="rememberMe">Remember me</RememberLabel>
             </InputRemember>
             <ErrorMessage>{invalidFields}</ErrorMessage>

@@ -4,8 +4,8 @@ import argentBankLogo from '../../assets/argentBankLogo.png'
 import { Link } from 'react-router-dom'
 import { faUserCircle, faSignOut } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { useSelector } from 'react-redux'
-
+import { useSelector, useDispatch } from 'react-redux'
+import { logout } from '../../features/login'
 // Creation components that using styled-component
 const MainNav = styled.nav`
     display: flex;
@@ -46,16 +46,6 @@ const H1 = styled.h1``
 // JSX // _________________________________________________________________
 
 /**
- * to log out and unstock token
- * @function
- * @name logout
- * @returns {object}
- */
-export const logout = () => {
-    localStorage.clear()
-    window.location = '/'
-}
-/**
  * Creation of a component to show the header
  * @returns {JSX} header
  */
@@ -63,7 +53,20 @@ export const logout = () => {
 function Header() {
     const { isLogged } = useSelector((state) => state.login)
     const firstName = useSelector((state) => state.user.firstName)
+    const isRemembered = localStorage.getItem('token')
+    const dispatch = useDispatch()
 
+    /**
+     * to log out and destock token when remember case is not checked
+     * @function
+     * @name logout
+     * @returns {object}
+     */
+    const signOut = () => {
+        dispatch(logout())
+        localStorage.removeItem('token')
+        sessionStorage.removeItem('token')
+    }
     return (
         <MainNav>
             <MainNavLogo to="/">
@@ -71,28 +74,27 @@ function Header() {
                     className="main-nav-logo-image"
                     src={argentBankLogo}
                     alt="Argent Bank Logo"
-                    onClick={logout}
                 />
                 <H1 className="sr-only">Argent Bank</H1>
             </MainNavLogo>
-            {!isLogged ? (
+            {isRemembered || isLogged ? (
+                <Div>
+                    <MainNavItem to="/profile">
+                        <FontAwesomeIcon icon={faUserCircle} />
+                        {firstName}
+                    </MainNavItem>
+                    <MainNavItem to="/login" onClick={signOut}>
+                        <FontAwesomeIcon icon={faSignOut} />
+                        Sign out
+                    </MainNavItem>
+                </Div>
+            ) : (
                 <Div>
                     <MainNavItem to="/login">
                         <FontAwesomeIcon icon={faUserCircle} />
                         Sign In
                     </MainNavItem>
                 </Div>
-            ) : (
-                <div>
-                    <MainNavItem to="/profile">
-                        <FontAwesomeIcon icon={faUserCircle} />
-                        {firstName}
-                    </MainNavItem>
-                    <MainNavItem to="/" onClick={logout}>
-                        <FontAwesomeIcon icon={faSignOut} />
-                        Sign out
-                    </MainNavItem>
-                </div>
             )}
         </MainNav>
     )

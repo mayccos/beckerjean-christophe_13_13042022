@@ -3,8 +3,6 @@ import { colors } from '../../utils/style/colors'
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
-// Selectors
-import { selectToken } from '../../utils/selector'
 // thunk
 import { profilePost } from '../../features/profile'
 // import accounts mocked
